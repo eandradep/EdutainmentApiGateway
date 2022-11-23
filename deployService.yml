@@ -3,32 +3,32 @@ version: '3.1'
 services:
   #Billin app backend service
   api-gateway-server:
+    container_name: api-gateway-server
     build:
       context: ./
       args:
-        - JAR_FILE=api-gateway-server.jar
-    container_name: api-gateway-server
+        - JAR_FILE=./target/api-gateway-server.jar
     deploy:
       resources:
         limits:
-          cpus: "0.30"
+          cpus: "1.0"
           memory: "650M"
         reservations:
-          cpus: "0.70"
+          cpus: "1.5"
           memory: "150M"
     environment:
       - JAVA_OPTS=
         -Xms256M
         -Xmx256M
     ports:
-      - "8761:8761"
+      - "8090:8090"
+    networks:
+      - edutainment-network
+    restart: always
+
+
 networks:
-  micro-service-cloud:
-    driver: bridge
-    ipam:
-      driver: defaul
-      config:
-        - subnet: 172.16.232.0/24
-          gateway: 172.16.232.1
+  edutainment-network:
+    external: true
 
 # End
