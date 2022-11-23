@@ -1,0 +1,10 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: edutainment-mobile-server
+          uri: lb://edutainment-mobile-server
+          predicates:
+            - Path=/api/products/**
+          filters:
+            - StripPrefix=2
