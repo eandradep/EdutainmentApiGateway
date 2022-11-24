@@ -22,13 +22,13 @@ services:
         -Xmx256M
     ports:
       - "8090:8090"
+    restart: always
     networks:
       - edutainment-network
-    restart: always
-
 
 networks:
   edutainment-network:
+    driver: edutainment-network
     external: true
 
 # End
