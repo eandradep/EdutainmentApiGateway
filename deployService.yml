@@ -1,0 +1,40 @@
+version: '3.1'
+
+services:
+  #Billin app backend service
+  server-gateway:
+    image: server-gateway:v1
+    container_name: server-gateway
+    build:
+      context: ./
+      args:
+        - JAR_FILE=EdutainmentApiGateway-0.0.1-SNAPSHOT.jar
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: "650M"
+        reservations:
+          cpus: "1.5"
+          memory: "150M"
+    environment:
+      - JAVA_OPTS=
+        -Xms256M
+        -Xmx256M
+    ports:
+      - "8091:8090"
+    networks:
+      - edutainment-private-network
+    restart: always
+#    volumes:
+#      - /opt/serverFiles/:/opt/serverFiles/
+#      - /opt/firmas/:/opt/firmas/
+#      - /opt/sshKey/:/opt/sshKey/
+
+
+networks:
+  edutainment-private-network:
+    driver: edutainment-private-network
+    external: true
+
+# End
