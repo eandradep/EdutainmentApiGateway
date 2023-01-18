@@ -23,6 +23,10 @@ dependencies {
 	implementation("org.springframework.cloud:spring-cloud-sleuth-zipkin")
 	implementation("org.springframework.cloud:spring-cloud-starter-config")
 	implementation("org.springframework.cloud:spring-cloud-starter-gateway")
+	implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
+	implementation("org.springframework.cloud:spring-cloud-starter-sleuth:3.1.5")
+	implementation("org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.0")
+	implementation("org.springdoc:springdoc-openapi-webflux-ui:1.6.14")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
