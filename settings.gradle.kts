@@ -1,1 +1,1 @@
-rootProject.name = "EdutainmentApiGateway"
+rootProject.name = "edutainmentApiGateway"
