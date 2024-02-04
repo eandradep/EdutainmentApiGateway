@@ -31,15 +31,12 @@ class AuthenticationManagerJwt : ReactiveAuthenticationManager {
                 Jwts.parserBuilder().setSigningKey(llave).build().parseClaimsJws(token).body
             }
             .map { claims ->
+                loggerFactory.info("Authorities found.")
                 val username = claims["user_name"] as String
-                loggerFactory.info("Usuario identificado: {}", username)
                 val roles = claims["authorities"] as List<*>
-                loggerFactory.info("tamano de roles: {}", roles.size)
-
                 val authorities: Collection<GrantedAuthority> =
                     roles.stream().map { role -> SimpleGrantedAuthority(role.toString()) }.collect(Collectors.toList())
-
-                loggerFactory.info("tamano de authorities: {}", authorities.size)
+                loggerFactory.info("User to request, {} and role size {}", username, authorities.size)
                 UsernamePasswordAuthenticationToken(username, null, authorities)
             }
     }

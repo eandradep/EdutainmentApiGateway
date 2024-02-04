@@ -22,24 +22,24 @@ class JwtAuthenticationFilter : WebFilter {
     private lateinit var authenticationManager: ReactiveAuthenticationManager
 
     override fun filter(exchange: ServerWebExchange, chain: WebFilterChain): Mono<Void> {
+        loggerFactory.info(" ---------> Start request <--------- ")
         return Mono.justOrEmpty<String>(exchange.request.headers.getFirst(HttpHeaders.AUTHORIZATION))
             .filter { authHeader: String -> authHeader.startsWith("Bearer ") }
             .switchIfEmpty(chain.filter(exchange).then(Mono.empty()))
             .map { token: String ->
-                loggerFactory.info("Token identificado: {}", token)
+                loggerFactory.info("Token identify!")
                 token.replace(
                     "Bearer ",
                     ""
                 )
             }
             .flatMap { token: String? ->
-                loggerFactory.info("New token: {}", token)
                 authenticationManager.authenticate(
                     UsernamePasswordAuthenticationToken(null, token)
                 )
             }
             .flatMap { authentication ->
-                loggerFactory.info("autentication !!!: {}", authentication)
+                loggerFactory.info(" ----------> End request <---------- ")
                 chain.filter(
                     exchange
                 ).contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication))
