@@ -9,12 +9,16 @@ import org.springframework.web.reactive.config.WebFluxConfigurer
 @EnableWebFlux
 class WebConfig : WebFluxConfigurer {
 
+    /**
+     * Adds Cross-Origin Resource Sharing (CORS) mappings to the provided CorsRegistry.
+     *
+     * @param registry The CorsRegistry object to configure CORS mappings.
+     */
     override fun addCorsMappings(registry: CorsRegistry) {
         registry
             .addMapping("/**")
             .allowedOrigins("*") // any host or put domain(s) here
             .allowedMethods("GET, POST, PUT, DELETE") // put the http verbs you want allow
             .allowedHeaders("Authorization") // put the http headers you want allow
-
     }
 }

@@ -6,9 +6,18 @@ import org.springframework.cloud.gateway.route.RouteDefinitionLocator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
+/**
+ * This class is responsible for configuring documentation.
+ */
 @Configuration
 class DocumentationConfiguration {
 
+    /**
+     * Retrieves a list of GroupedOpenApi objects based on the provided RouteDefinitionLocator.
+     *
+     * @param locator The RouteDefinitionLocator used to find route definitions.
+     * @return A list of GroupedOpenApi objects.
+     */
     @Bean
     fun apis(locator: RouteDefinitionLocator): List<GroupedOpenApi> {
         val groups: List<GroupedOpenApi> = ArrayList()

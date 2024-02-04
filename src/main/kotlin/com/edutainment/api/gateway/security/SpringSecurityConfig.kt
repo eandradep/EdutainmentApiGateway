@@ -11,25 +11,58 @@ import org.springframework.security.web.server.SecurityWebFilterChain
 import reactor.core.publisher.Mono
 
 
+/**
+ * The `SpringSecurityConfig` class is responsible for configuring the HTTP security for the application.
+ *
+ * @constructor Creates a new instance of the `SpringSecurityConfig` class.
+ */
 @EnableWebFluxSecurity
 class SpringSecurityConfig {
 
 
+    /**
+     * The `authenticationFilter` property is a Spring WebFilter that performs JWT token authentication.
+     * It is used to authenticate requests using a JWT token.
+     *
+     * @property authenticationFilter The JwtAuthenticationFilter instance.
+     * @see JwtAuthenticationFilter
+     */
     @Autowired
     private lateinit var authenticationFilter: JwtAuthenticationFilter
 
+    /**
+     * Configures the HTTP security for the application.
+     *
+     * @param http The ServerHttpSecurity instance to configure.
+     * @return The configured SecurityWebFilterChain.
+     */
     @Bean
     fun configure(http: ServerHttpSecurity): SecurityWebFilterChain {
         return http.authorizeExchange()
+            .let { setupAdminRoles(it) }
+            .let { setupCombinedRoles(it) }
+            .let { setupOpenServices(it) }
+            .anyExchange().authenticated()
+            .and().addFilterAt(authenticationFilter, SecurityWebFiltersOrder.AUTHENTICATION)
+            .csrf().disable()
+            .build()
+    }
 
-//            ADMIN ROLES
-
+    /**
+     * Sets up the admin roles for authorization.
+     *
+     * @param http The ServerHttpSecurity.AuthorizeExchangeSpec instance to configure.
+     * @return The configured ServerHttpSecurity.AuthorizeExchangeSpec instance.
+     */
+    private fun setupAdminRoles(http: ServerHttpSecurity.AuthorizeExchangeSpec): ServerHttpSecurity.AuthorizeExchangeSpec {
+        return http
             .pathMatchers(
                 HttpMethod.GET,
                 "/edutainment/person/userProfileController/findPersonByIdentification/{personIdentification}",
                 "/edutainment/person/userProfileController/findStudents",
                 "/edutainment/repositorie/api/crud/tags/{id}",
-            ).hasRole("ADMIN")
+            )
+            .hasRole("ADMIN")
             .pathMatchers(
                 HttpMethod.POST,
                 "/edutainment/repositorie/api/crud/tags",
@@ -42,17 +75,24 @@ class SpringSecurityConfig {
                 HttpMethod.PATCH,
                 "/edutainment/repositorie/api/crud/tags/**",
             ).hasRole("ADMIN")
+    }
 
-//            COMBINATED ROLES
+    /**
+     * Setup combined roles for specific paths in the HTTP security configuration.
+     *
+     * @param http The ServerHttpSecurity.AuthorizeExchangeSpec object.
+     * @return The modified ServerHttpSecurity.AuthorizeExchangeSpec object.
+     */
+    private fun setupCombinedRoles(http: ServerHttpSecurity.AuthorizeExchangeSpec): ServerHttpSecurity.AuthorizeExchangeSpec {
+        return http
             .pathMatchers(
                 "/edutainment/dialogues/sequenceController/**",
                 "/edutainment/person/userProfileController/findPersonByID/{personID}",
                 "/edutainment/person/userProfileController/updatePerson/{personID}",
                 "/edutainment/person/userProfileController/findPersonByUserID/{userId}",
-//
                 "/edutainment/repositorie/api/crud/tags",
-            ).hasAnyRole("ADMIN", "USER")
-
+            )
+            .hasAnyRole("ADMIN", "USER")
             .pathMatchers(
                 HttpMethod.POST,
                 "/edutainment/repositorie/api/crud/resources",
@@ -83,10 +123,16 @@ class SpringSecurityConfig {
                 "/edutainment/filesystem/api/data/update/resource",
                 "/edutainment/filesystem/api/data/update-names",
             ).hasAnyRole("ADMIN", "USER")
+    }
 
-
-//            OPEN SERVICES
-
+    /**
+     * Sets up the open services for authorization.
+     *
+     * @param http The ServerHttpSecurity.AuthorizeExchangeSpec object.
+     * @return The modified ServerHttpSecurity.AuthorizeExchangeSpec object with open services configuration.
+     */
+    private fun setupOpenServices(http: ServerHttpSecurity.AuthorizeExchangeSpec): ServerHttpSecurity.AuthorizeExchangeSpec {
+        return http
             .pathMatchers(
                 "/edutainment/oauth/**",
                 "/edutainment/person/genderController/findAllGender",
@@ -102,7 +148,8 @@ class SpringSecurityConfig {
                 "/edutainment/repositorie/api/crud/games/**",
                 "/edutainment/repositorie/api/crud/games/slug/**",
                 "/edutainment/filesystem/api/data/download",
-            ).permitAll()
+            )
+            .permitAll()
             .pathMatchers(HttpMethod.GET).access { _, exchange ->
                 Mono.just(
                     AuthorizationDecision(
@@ -114,10 +161,6 @@ class SpringSecurityConfig {
                     )
                 )
             }
-            .anyExchange().authenticated()
-            .and().addFilterAt(authenticationFilter, SecurityWebFiltersOrder.AUTHENTICATION)
-            .csrf().disable()
-            .build()
     }
 
 
