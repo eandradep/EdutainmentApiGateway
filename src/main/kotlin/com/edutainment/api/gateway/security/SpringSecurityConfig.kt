@@ -39,10 +39,15 @@ class SpringSecurityConfig {
     @Bean
     fun configure(http: ServerHttpSecurity): SecurityWebFilterChain {
         return http.authorizeExchange()
-            .let { setupAdminRoles(it) }
-            .let { setupCombinedRolesAdminRepository(it) }
-            .let { setupCombinedRolesAdminUser(it) }
-            .let { setupOpenServices(it) }
+            .let { getAdminConfigurations(it) }
+            .let { getAdminRepositoryConfigurations(it) }
+            .let { getAdminUserConfigurations(it) }
+            .let { getNoAuthRequiredConfigurations(it) }
+
+//            COMBINATED ROUTES ADMIN AND USER
+
+//            OPEN PATHS.
+
             .anyExchange().authenticated()
             .and().addFilterAt(authenticationFilter, SecurityWebFiltersOrder.AUTHENTICATION)
             .csrf().disable()
@@ -50,14 +55,16 @@ class SpringSecurityConfig {
     }
 
     /**
-     * Sets up the admin roles for authorization.
+     * Retrieves the admin configurations for the given ServerHttpSecurity.AuthorizeExchangeSpec.
      *
-     * @param http The ServerHttpSecurity.AuthorizeExchangeSpec instance to configure.
-     * @return The configured ServerHttpSecurity.AuthorizeExchangeSpec instance.
+     * @param http The ServerHttpSecurity.AuthorizeExchangeSpec to configure the admin configurations.
+     * @return The configured ServerHttpSecurity.AuthorizeExchangeSpec with admin configurations.
      */
-    private fun setupAdminRoles(http: ServerHttpSecurity.AuthorizeExchangeSpec): ServerHttpSecurity.AuthorizeExchangeSpec {
+    private fun getAdminConfigurations
+                (http: ServerHttpSecurity.AuthorizeExchangeSpec): ServerHttpSecurity.AuthorizeExchangeSpec {
         return http
             .pathMatchers(
+//                ADMIN ROUTES
                 HttpMethod.GET,
                 "/edutainment/person/userProfileController/findPersonByIdentification/{personIdentification}",
                 "/edutainment/person/userProfileController/findStudents",
@@ -67,33 +74,29 @@ class SpringSecurityConfig {
             .pathMatchers(
                 HttpMethod.POST,
                 "/edutainment/repositorie/api/crud/tags",
-            ).hasRole("ADMIN")
+            )
+            .hasRole("ADMIN")
             .pathMatchers(
                 HttpMethod.DELETE,
                 "/edutainment/repositorie/api/crud/tags/**",
-            ).hasRole("ADMIN")
+            )
+            .hasRole("ADMIN")
             .pathMatchers(
                 HttpMethod.PATCH,
                 "/edutainment/repositorie/api/crud/tags/**",
-            ).hasRole("ADMIN")
-    }
-
-    /**
-     * Setup combined roles for specific paths in the HTTP security configuration.
-     *
-     * @param http The ServerHttpSecurity.AuthorizeExchangeSpec object.
-     * @return The modified ServerHttpSecurity.AuthorizeExchangeSpec object.
-     */
-    private fun setupCombinedRolesAdminRepository(http: ServerHttpSecurity.AuthorizeExchangeSpec): ServerHttpSecurity.AuthorizeExchangeSpec {
-        return http
-            .pathMatchers(
-                "/edutainment/dialogues/sequenceController/**",
-                "/edutainment/person/userProfileController/findPersonByID/{personID}",
-                "/edutainment/person/userProfileController/updatePerson/{personID}",
-                "/edutainment/person/userProfileController/findPersonByUserID/{userId}",
-                "/edutainment/repositorie/api/crud/tags",
             )
-            .hasAnyRole("ADMIN", "REPOSITORY")
+            .hasRole("ADMIN")
+
+    }
+    /**
+     * Configures the admin repository configurations for the given ServerHttpSecurity.AuthorizeExchangeSpec instance.
+     *
+     * @param http The ServerHttpSecurity.AuthorizeExchangeSpec instance to configure.
+     * @return The configured ServerHttpSecurity.AuthorizeExchangeSpec.
+     */
+    private fun getAdminRepositoryConfigurations(
+        http: ServerHttpSecurity.AuthorizeExchangeSpec): ServerHttpSecurity.AuthorizeExchangeSpec {
+        return http
             .pathMatchers(
                 HttpMethod.POST,
                 "/edutainment/repositorie/api/crud/resources",
@@ -124,8 +127,16 @@ class SpringSecurityConfig {
                 "/edutainment/filesystem/api/data/update/resource",
                 "/edutainment/filesystem/api/data/update-names",
             ).hasAnyRole("ADMIN", "REPOSITORY")
+
     }
-    private fun setupCombinedRolesAdminUser(http: ServerHttpSecurity.AuthorizeExchangeSpec): ServerHttpSecurity.AuthorizeExchangeSpec {
+    /**
+     * Retrieves the configurations for admin users in the HTTP security.
+     *
+     * @param http The ServerHttpSecurity.AuthorizeExchangeSpec to configure the admin user configurations.
+     * @return The modified ServerHttpSecurity.AuthorizeExchangeSpec with the admin user configurations applied.
+     */
+    private fun getAdminUserConfigurations(
+        http: ServerHttpSecurity.AuthorizeExchangeSpec): ServerHttpSecurity.AuthorizeExchangeSpec {
         return http
             .pathMatchers(
                 "/edutainment/dialogues/sequenceController/**",
@@ -136,14 +147,14 @@ class SpringSecurityConfig {
             .hasAnyRole("ADMIN", "USER")
 
     }
-
     /**
-     * Sets up the open services for authorization.
+     * Retrieves the configurations for endpoints that do not require authentication.
      *
-     * @param http The ServerHttpSecurity.AuthorizeExchangeSpec object.
-     * @return The modified ServerHttpSecurity.AuthorizeExchangeSpec object with open services configuration.
+     * @param http The ServerHttpSecurity.AuthorizeExchangeSpec instance to configure.
+     * @return The configured ServerHttpSecurity.AuthorizeExchangeSpec.
      */
-    private fun setupOpenServices(http: ServerHttpSecurity.AuthorizeExchangeSpec): ServerHttpSecurity.AuthorizeExchangeSpec {
+    private fun getNoAuthRequiredConfigurations(
+        http: ServerHttpSecurity.AuthorizeExchangeSpec): ServerHttpSecurity.AuthorizeExchangeSpec {
         return http
             .pathMatchers(
                 "/edutainment/oauth/**",
@@ -174,7 +185,7 @@ class SpringSecurityConfig {
                     )
                 )
             }
-    }
 
+    }
 
 }

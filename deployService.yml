@@ -3,12 +3,12 @@ version: '3.1'
 services:
   #Billin app backend service
   server-gateway:
-    image: server-gateway:v1
+    image: server-gateway:v1.1
     container_name: server-gateway
     build:
       context: ./
       args:
-        - JAR_FILE=EdutainmentApiGateway-0.0.1-SNAPSHOT.jar
+        - JAR_FILE=./build/libs/edutainmentApiGateway.jar
     deploy:
       resources:
         limits:
