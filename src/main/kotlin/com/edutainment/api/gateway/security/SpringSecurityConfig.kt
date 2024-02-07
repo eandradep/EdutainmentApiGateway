@@ -41,8 +41,9 @@ class SpringSecurityConfig {
         return http.authorizeExchange()
             .let { getAdminConfigurations(it) }
             .let { getAdminRepositoryConfigurations(it) }
-            .let { getAdminUserConfigurations(it) }
-            .let { getNoAuthRequiredConfigurations(it) }
+//            .let { getUserConfigurations(it) }
+//            .let { getAdminUserConfigurations(it) }
+//            .let { getNoAuthRequiredConfigurations(it) }
 
 //            COMBINATED ROUTES ADMIN AND USER
 
@@ -64,26 +65,27 @@ class SpringSecurityConfig {
                 (http: ServerHttpSecurity.AuthorizeExchangeSpec): ServerHttpSecurity.AuthorizeExchangeSpec {
         return http
             .pathMatchers(
-//                ADMIN ROUTES
-                HttpMethod.GET,
-                "/edutainment/person/userProfileController/findPersonByIdentification/{personIdentification}",
-                "/edutainment/person/userProfileController/findStudents",
-                "/edutainment/repositorie/api/crud/tags/{id}",
-            )
-            .hasRole("ADMIN")
-            .pathMatchers(
                 HttpMethod.POST,
                 "/edutainment/repositorie/api/crud/tags",
             )
             .hasRole("ADMIN")
             .pathMatchers(
                 HttpMethod.DELETE,
-                "/edutainment/repositorie/api/crud/tags/**",
+                "/edutainment/repositorie/api/crud/tags/{id}",
             )
             .hasRole("ADMIN")
             .pathMatchers(
                 HttpMethod.PATCH,
+                "/edutainment/repositorie/api/crud/tags/{id}",
+            )
+            .hasRole("ADMIN")
+            .pathMatchers(
+//                ADMIN ROUTES
+                HttpMethod.GET,
+                "/edutainment/person/userProfileController/findPersonByIdentification/**",
+                "/edutainment/person/userProfileController/findStudents",
                 "/edutainment/repositorie/api/crud/tags/**",
+                "/edutainment/project/projectController/findAllProjects/**",
             )
             .hasRole("ADMIN")
 
@@ -139,10 +141,25 @@ class SpringSecurityConfig {
         http: ServerHttpSecurity.AuthorizeExchangeSpec): ServerHttpSecurity.AuthorizeExchangeSpec {
         return http
             .pathMatchers(
-                "/edutainment/dialogues/sequenceController/**",
-                "/edutainment/person/userProfileController/findPersonByID/{personID}",
-                "/edutainment/person/userProfileController/updatePerson/{personID}",
-                "/edutainment/person/userProfileController/findPersonByUserID/{userId}",
+                HttpMethod.GET,
+                "/edutainment/person/userProfileController/findPersonByID/**",
+                "/edutainment/person/userProfileController/updatePerson/**",
+                "/edutainment/person/userProfileController/findPersonByUserID/**",
+                "/edutainment/project/projectController/findProjectById/**",
+                "/edutainment/game/entryRecordController/findRegisterByPersonAndGameId/**",
+                "/edutainment/game/gameController/finGameById/**",
+                "/edutainment/game/gameController/findGameByProjectId/**",
+            )
+            .hasAnyRole("ADMIN", "USER")
+
+    }
+
+    private fun getUserConfigurations(
+        http: ServerHttpSecurity.AuthorizeExchangeSpec): ServerHttpSecurity.AuthorizeExchangeSpec {
+        return http
+            .pathMatchers(
+                HttpMethod.POST,
+                "/edutainment/game/entryRecordController/createEntryRecord",
             )
             .hasAnyRole("ADMIN", "USER")
 
@@ -162,7 +179,7 @@ class SpringSecurityConfig {
                 "/edutainment/person/userProfileController/createPerson",
                 "/edutainment/student/student-controller/createStudent",
                 "/edutainment/repositorie/api/crud/tags",
-                "/edutainment/repositorie/api/crud/tags/search/{name}",
+                "/edutainment/repositorie/api/crud/tags/search/**",
                 "/edutainment/repositorie/api/crud/resources",
                 "/edutainment/repositorie/api/crud/resources/search",
                 "/edutainment/repositorie/api/crud/resources/kind",

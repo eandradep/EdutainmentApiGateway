@@ -1,5 +1,6 @@
 package com.edutainment.api.gateway.security
 
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
 import org.springframework.security.authentication.ReactiveAuthenticationManager
@@ -10,8 +11,6 @@ import org.springframework.web.server.ServerWebExchange
 import org.springframework.web.server.WebFilter
 import org.springframework.web.server.WebFilterChain
 import reactor.core.publisher.Mono
-
-import org.slf4j.LoggerFactory
 
 /**
  * JwtAuthenticationFilter is a Spring WebFilter that performs JWT token authentication.
@@ -45,9 +44,10 @@ class JwtAuthenticationFilter : WebFilter {
      */
     override fun filter(exchange: ServerWebExchange, chain: WebFilterChain): Mono<Void> {
         loggerFactory.info(" ---------> Start request <--------- ")
-        return Mono.justOrEmpty<String>(exchange.request.headers.getFirst(HttpHeaders.AUTHORIZATION))
-            .filter { authHeader: String -> authHeader.startsWith("Bearer ") }
-            .switchIfEmpty(chain.filter(exchange).then(Mono.empty()))
+
+        return Mono.justOrEmpty<String>(this.validateFirstPart(exchange))
+            .filter { authHeader: String -> this.validateStartWith(authHeader) }
+            .switchIfEmpty(this.validateSwithc(chain, exchange))
             .map { token: String ->
                 loggerFactory.info("Token identify!")
                 token.replace(
@@ -66,5 +66,38 @@ class JwtAuthenticationFilter : WebFilter {
                     exchange
                 ).contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication))
             }
+    }
+
+    private fun validateSwithc(chain: WebFilterChain, exchange: ServerWebExchange): Mono<out String> {
+        loggerFactory.info("validateSwithc");
+        val x: Mono<out String> = chain.filter(exchange).then(Mono.empty());
+
+        loggerFactory.info("validateStartWith. {}", x)
+        return x;
+    }
+
+
+    private fun validateStartWith(authHeader: String): Boolean {
+        loggerFactory.info("validateStartWith");
+        val x = authHeader.startsWith("Bearer ")
+        loggerFactory.info("validateStartWith. {}", x)
+        return x
+    }
+
+    private fun validateFirstPart(exchange: ServerWebExchange): String? {
+        loggerFactory.info("data del loggesr");
+        loggerFactory.info("headers {}", exchange.request.headers);
+        exchange.request.headers.forEach { entry ->
+            loggerFactory.info("headers {}", entry.key)
+            if (entry.key.equals("Access-Control-Request-Headers")) {
+                entry.value.forEach { s: String? ->
+                    loggerFactory.info("Access-Control-Request-Headers {}", s)
+                }
+            }
+        }
+        ;
+        val x = exchange.request.headers.getFirst(HttpHeaders.AUTHORIZATION)
+        loggerFactory.info("data del loggesr. {}", x)
+        return x
     }
 }

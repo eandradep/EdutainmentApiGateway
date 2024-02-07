@@ -20,6 +20,7 @@ class ApiGatewayFilter(configClass: Class<Configuracion>?) :
 
 
     override fun apply(config: Configuracion): GatewayFilter {
+        logger.info("ejecutando pre gateway filter factory: " + config.mensaje)
         return GatewayFilter { exchange: ServerWebExchange, chain: GatewayFilterChain ->
             logger.info("ejecutando pre gateway filter factory: " + config.mensaje)
             chain.filter(exchange)
