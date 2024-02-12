@@ -41,7 +41,7 @@ class SpringSecurityConfig {
         return http.authorizeExchange()
 //            .let { getAdminConfigurations(it) }
             .let { getAdminRepositoryConfigurations(it) }
-//            .let { getUserConfigurations(it) }
+            .let { getUserConfigurations(it) }
 //            .let { getAdminUserConfigurations(it) }
 
             .let { getNoAuthRequiredConfigurations(it) }
@@ -161,10 +161,19 @@ class SpringSecurityConfig {
     ): ServerHttpSecurity.AuthorizeExchangeSpec {
         return http
             .pathMatchers(
+                HttpMethod.GET,
+                "/edutainment/project/projectController/findProjectById/{projectId}",
+                "/edutainment/game/gameController/findGameByProjectId/{projectId}",
+                "/edutainment/game/gameController/finGameById/{gameId}",
+                "/edutainment/dialogues/sequences/{gameId}/game",
+                "/edutainment/dialogues/dialogues/{sequenceId}/sequence",
+            )
+            .hasAnyRole("USER")
+            .pathMatchers(
                 HttpMethod.POST,
                 "/edutainment/game/entryRecordController/createEntryRecord",
             )
-            .hasAnyRole("ADMIN", "USER")
+            .hasAnyRole("USER")
 
     }
 
@@ -204,9 +213,8 @@ class SpringSecurityConfig {
                 "/edutainment/repositorie/api/crud/tags/findAllTagsByPagination",
                 "/edutainment/repositorie/api/crud/tags/findAllTagsPaginatedByName/{name}",
 
-                "/edutainment/filesystem/api/data/download-resource",
-                "/edutainment/media-references/**",
-                "/edutainment/resources/**",
+                "/edutainment/filesystem/api/data/download-resources",
+                "/edutainment/filesystem/api/data/download-resources",
             )
             .permitAll()
             .pathMatchers(HttpMethod.GET).access { _, exchange ->
@@ -215,6 +223,10 @@ class SpringSecurityConfig {
                         exchange.exchange.request.uri.path.contains("webjars/swagger-ui")
                                 or
                                 exchange.exchange.request.uri.path.contains("v3/api-docs")
+                                or
+                                exchange.exchange.request.uri.path.contains("edutainment/resources")
+                                or
+                                exchange.exchange.request.uri.path.contains("edutainment/media-references")
                     )
                 )
             }
