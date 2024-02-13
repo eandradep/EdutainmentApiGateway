@@ -39,11 +39,8 @@ class SpringSecurityConfig {
     @Bean
     fun configure(http: ServerHttpSecurity): SecurityWebFilterChain {
         return http.authorizeExchange()
-//            .let { getAdminConfigurations(it) }
             .let { getAdminRepositoryConfigurations(it) }
             .let { getUserConfigurations(it) }
-//            .let { getAdminUserConfigurations(it) }
-
             .let { getNoAuthRequiredConfigurations(it) }
 
 //            COMBINATED ROUTES ADMIN AND USER
@@ -54,41 +51,6 @@ class SpringSecurityConfig {
             .and().addFilterAt(authenticationFilter, SecurityWebFiltersOrder.AUTHENTICATION)
             .csrf().disable()
             .build()
-    }
-
-    /**
-     * Retrieves the admin configurations for the given ServerHttpSecurity.AuthorizeExchangeSpec.
-     *
-     * @param http The ServerHttpSecurity.AuthorizeExchangeSpec to configure the admin configurations.
-     * @return The configured ServerHttpSecurity.AuthorizeExchangeSpec with admin configurations.
-     */
-    private fun getAdminConfigurations(http: ServerHttpSecurity.AuthorizeExchangeSpec): ServerHttpSecurity.AuthorizeExchangeSpec {
-        return http
-            .pathMatchers(
-                HttpMethod.POST,
-                "/edutainment/repositorie/api/crud/tags",
-            )
-            .hasRole("ADMIN")
-            .pathMatchers(
-                HttpMethod.DELETE,
-                "/edutainment/repositorie/api/crud/tags/{id}",
-            )
-            .hasRole("ADMIN")
-            .pathMatchers(
-                HttpMethod.PATCH,
-                "/edutainment/repositorie/api/crud/tags/{id}",
-            )
-            .hasRole("ADMIN")
-            .pathMatchers(
-//                ADMIN ROUTES
-                HttpMethod.GET,
-                "/edutainment/person/userProfileController/findPersonByIdentification/**",
-                "/edutainment/person/userProfileController/findStudents",
-                "/edutainment/repositorie/api/crud/tags/**",
-                "/edutainment/project/projectController/findAllProjects/**",
-            )
-            .hasRole("ADMIN")
-
     }
 
     /**
@@ -132,46 +94,23 @@ class SpringSecurityConfig {
             ).hasAnyRole("ADMIN", "REPOSITORY")
     }
 
-    /**
-     * Retrieves the configurations for admin users in the HTTP security.
-     *
-     * @param http The ServerHttpSecurity.AuthorizeExchangeSpec to configure the admin user configurations.
-     * @return The modified ServerHttpSecurity.AuthorizeExchangeSpec with the admin user configurations applied.
-     */
-    private fun getAdminUserConfigurations(
-        http: ServerHttpSecurity.AuthorizeExchangeSpec
-    ): ServerHttpSecurity.AuthorizeExchangeSpec {
-        return http
-            .pathMatchers(
-                HttpMethod.GET,
-                "/edutainment/person/userProfileController/findPersonByID/**",
-                "/edutainment/person/userProfileController/updatePerson/**",
-                "/edutainment/person/userProfileController/findPersonByUserID/**",
-                "/edutainment/project/projectController/findProjectById/**",
-                "/edutainment/game/entryRecordController/findRegisterByPersonAndGameId/**",
-                "/edutainment/game/gameController/finGameById/**",
-                "/edutainment/game/gameController/findGameByProjectId/**",
-            )
-            .hasAnyRole("ADMIN", "USER")
-
-    }
-
     private fun getUserConfigurations(
         http: ServerHttpSecurity.AuthorizeExchangeSpec
     ): ServerHttpSecurity.AuthorizeExchangeSpec {
         return http
             .pathMatchers(
                 HttpMethod.GET,
-                "/edutainment/project/projectController/findProjectById/{projectId}",
-                "/edutainment/game/gameController/findGameByProjectId/{projectId}",
-                "/edutainment/game/gameController/finGameById/{gameId}",
+                "/edutainment/projects/{projectId}",
+                "/edutainment/games/{projectId}/project",
+                "/edutainment/games/{gameId}",
+                "/edutainment/games/entryRecords/{personId}/persons/{gameId}/games",
                 "/edutainment/dialogues/sequences/{gameId}/game",
-                "/edutainment/dialogues/dialogues/{sequenceId}/sequence",
+                "/edutainment/dialogues/{sequenceId}/sequence",
             )
             .hasAnyRole("USER")
             .pathMatchers(
                 HttpMethod.POST,
-                "/edutainment/game/entryRecordController/createEntryRecord",
+                "/edutainment/games/entryRecords",
             )
             .hasAnyRole("USER")
 

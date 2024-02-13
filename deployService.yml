@@ -3,7 +3,7 @@ version: '3.1'
 services:
   #Billin app backend service
   server-gateway:
-    image: server-gateway:v1.33
+    image: server-gateway:v1.35
     container_name: server-gateway
     build:
       context: ./
