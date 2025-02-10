@@ -106,11 +106,16 @@ class SpringSecurityConfig {
                 "/edutainment/games/entryRecords/{personId}/persons/{gameId}/games",
                 "/edutainment/dialogues/sequences/{gameId}/game",
                 "/edutainment/dialogues/{sequenceId}/sequence",
+                "/edutainment/games/entryRecords/{personId}/persons/{gameId}/games",
+                "/edutainment/question/{gameId}/game",
+                "/edutainment/question/answers/{questionId}",
+                "/edutainment/response/userResponseController/findAllResponsesByRecordEntry/{entryRecordId}",
             )
             .hasAnyRole("USER")
             .pathMatchers(
                 HttpMethod.POST,
                 "/edutainment/games/entryRecords",
+                "/edutainment/response/userResponseController/saveMultipleChoiceUserResponse",
             )
             .hasAnyRole("USER")
 
@@ -130,6 +135,7 @@ class SpringSecurityConfig {
                 "/**")
             .permitAll()
             .pathMatchers(
+                "/edutainment/**",
                 "/edutainment/oauth/**",
                 "/edutainment/person/genderController/findAllGender",
                 "/edutainment/person/userProfileController/createPerson",
@@ -154,6 +160,9 @@ class SpringSecurityConfig {
 
                 "/edutainment/filesystem/api/data/download-resources",
                 "/edutainment/filesystem/api/data/download-resources",
+                "/edutainment/filesystem/resources/**",
+                "/edutainment/filesystem/media-references/**",
+                "/edutainment/filesystem/api/data/static-content/**",
             )
             .permitAll()
             .pathMatchers(HttpMethod.GET).access { _, exchange ->
@@ -162,10 +171,6 @@ class SpringSecurityConfig {
                         exchange.exchange.request.uri.path.contains("webjars/swagger-ui")
                                 or
                                 exchange.exchange.request.uri.path.contains("v3/api-docs")
-                                or
-                                exchange.exchange.request.uri.path.contains("edutainment/resources")
-                                or
-                                exchange.exchange.request.uri.path.contains("edutainment/media-references")
                     )
                 )
             }
